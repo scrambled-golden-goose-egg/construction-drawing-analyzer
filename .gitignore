@@ -11,6 +11,10 @@ indexes/symbol-library.md
 !sheets/.gitkeep
 !indexes/.gitkeep
 
+# Skill inputs and outputs: client data, never commit
+inputs/
+outputs/
+
 # Python
 __pycache__/
 *.pyc

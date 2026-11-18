@@ -25,11 +25,12 @@ It also marks up the drawings to show what was counted, so the estimator can aud
 Before running this skill:
 
 1. The Drawing Analyzer skill must have been run on the drawing set
-2. The `0.ai-context/` folder must exist with:
-   - `drawings.md` (master register)
-   - `symbols.md` (legend library)
-   - `cross-references.md`
-   - `processed/[sheet].md` files (one per sheet)
+2. The Drawing Analyzer output must exist:
+   - `indexes/drawings.md` (master register)
+   - `indexes/sheet-classification.md` (sheet types, scales, key elements)
+   - `indexes/symbol-library.md` (legend library)
+   - `indexes/cross-reference.md` (cross-reference matrix)
+   - `sheets/SHEET-XXX.txt` and `sheets/SHEET-XXX.png` (one pair per sheet)
 3. An Excel template must exist at `templates/takeoff-template.xlsx` (or specify another path in the prompt)
 
 If any of these are missing, the skill stops and tells the user what to run first.
@@ -56,7 +57,9 @@ Do not proceed until the user confirms.
 
 ### Phase 2: Identify countable elements
 
-Read the relevant sheet summaries from `0.ai-context/processed/`.
+Read `indexes/drawings.md` and `indexes/sheet-classification.md` to find the sheets in scope. Check `indexes/cross-reference.md` for schedules and details those sheets point to, and `indexes/symbol-library.md` for tag and symbol meanings. Then read each in-scope sheet's `sheets/SHEET-XXX.txt` (text and vector layer) and view `sheets/SHEET-XXX.png` (visual check).
+
+For area takeoffs, run `scripts/extract_polygons.py --sheet SHEET-XXX` on that sheet only.
 
 For each sheet in the scope, identify every element that can be counted or measured:
 
@@ -144,29 +147,31 @@ The estimator opens these images to audit what was counted before using the quan
 
 Use the template at `templates/takeoff-template.xlsx`.
 
-Populate the columns:
+Copy the template to `outputs/[project]-takeoff.xlsx` and write into the copy. Never edit the template itself.
 
-| Col | Header | Content |
-|-----|--------|---------|
-| A | Item No | Sequential |
-| B | Element | Plain language description |
-| C | Tag | Drawing tag |
-| D | Source sheet | Drawing number |
-| E | Source method | How the quantity was determined |
-| F | Primary qty | Number |
-| G | Unit | EA / m / m2 / m3 / LM |
-| H | Confidence | HIGH / MEDIUM / LOW |
-| I | Secondary: Excavation (m3) | Calculated |
-| J | Secondary: Concrete (m3) | Calculated |
-| K | Secondary: Formwork (m2) | Calculated |
-| L | Secondary: Reinforcement (kg) | Calculated |
-| M | Notes | Manual check flags |
+The column layout matches `templates/takeoff-template-structure.md`. Do not change column positions.
 
-Section headers by element type (FOUNDATIONS, COLUMNS, BEAMS, SLABS).
-Subtotals per section.
-Grand totals at the bottom.
+| Col | Header | Content | Written by |
+|-----|--------|---------|------------|
+| A | Item No | Sequential | Claude |
+| B | Element | Plain language element type | Claude |
+| C | Description | Drawing tag first, then the spec (e.g. `F1: 1200x1200x600 pad, 4-N16 EW, N32`) | Claude |
+| D | Source Sheet | Drawing number | Claude |
+| E | Source Method | Tag count / Schedule / Visual / Dimension | Claude |
+| F | Qty | Number only | Claude |
+| G | Unit | EA / m / m2 / m3 / LM / kg | Claude |
+| H | Confidence | HIGH / MEDIUM / LOW | Claude |
+| I | Excavation (m3) | Calculated | Claude |
+| J | Concrete (m3) | Calculated | Claude |
+| K | Formwork (m2) | Calculated | Claude |
+| L | Reinforcement (kg) | Calculated | Claude |
+| M | Rate | Leave blank | Estimator |
+| N | Total | Pre-filled formula, do not overwrite | Template |
+| O | Notes | Manual check flags, reason for every LOW | Claude |
 
-Save to `outputs/[project]-takeoff.xlsx`.
+The template already has section headers (FOUNDATIONS, COLUMNS, BEAMS, SLABS, REINFORCEMENT SUMMARY), sub-headers, Subtotal rows and a TOTALS row. Write each element into the blank rows under its matching sub-header. Leave unused blank rows in place.
+
+If a block runs out of blank rows, insert rows between the sub-header and that section's Subtotal row, copy the column N formula into them, and then update that section's Subtotal formulas and the TOTALS formulas to cover the new range (openpyxl does not adjust formula references when rows are inserted). Recalculate and confirm there are no formula errors before reporting.
 
 ### Phase 7: Completion report
 
@@ -212,8 +217,8 @@ Next step:
 If the user is asking this skill to do something the Bluebeam Claude integration cannot do (slab areas, line type interpretation, visual element counts), this skill handles it because:
 
 1. The Drawing Analyzer skill has already done a visual analysis of every sheet
-2. The visual analysis output is stored in the sheet's .md file
-3. This skill reads that output and uses it for visual-only items
+2. The visual analysis is stored in `indexes/sheet-classification.md`, with the rendered sheet at `sheets/SHEET-XXX.png`
+3. This skill reads that output and views the sheet image for visual-only items
 
 For visual-only items (no text tag, identified from image analysis only), mark as MEDIUM confidence and flag for manual verification.
 

@@ -2,7 +2,7 @@
 
 The construction-takeoff skill populates your Excel template. You build the template once and reuse it on every project.
 
-Save your completed template as `templates/takeoff-template.xlsx` in this repo or in your project folder.
+A ready-built version is at `templates/takeoff-template.xlsx`. Use it as is, or rebuild it to your firm's format using the structure below and save over that file.
 
 ---
 
@@ -61,14 +61,16 @@ In column N (Total), add this formula and copy down:
 =IF(F5="","",F5*M5)
 ```
 
-In the TOTALS row, add SUM formulas for the secondary quantity columns:
+In each section Subtotal row and the TOTALS row, use SUBTOTAL rather than SUM for the secondary quantity and cost columns (I, J, K, L, N), covering the full range above:
 ```
-=SUM(I5:I100)   for Excavation total
-=SUM(J5:J100)   for Concrete total
-=SUM(K5:K100)   for Formwork total
-=SUM(L5:L100)   for Reinforcement total
-=SUM(N5:N100)   for Cost total
+=SUBTOTAL(9,I3:I193)   for Excavation total
+=SUBTOTAL(9,J3:J193)   for Concrete total
+=SUBTOTAL(9,K3:K193)   for Formwork total
+=SUBTOTAL(9,L3:L193)   for Reinforcement total
+=SUBTOTAL(9,N3:N193)   for Cost total
 ```
+
+SUBTOTAL skips other SUBTOTAL cells, so the grand total does not double count the section subtotals. A plain SUM would.
 
 ---
 

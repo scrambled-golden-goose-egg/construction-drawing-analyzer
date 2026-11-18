@@ -32,9 +32,12 @@ construction-drawing-analyzer/
 │   ├── takeoff-guide.md                   <- How to run accurate takeoffs
 │   └── structural-secondary-quantities.md <- Default ratios for concrete, formwork, reinforcement
 ├── templates/
-│   └── takeoff-template-structure.md      <- How to build your Excel takeoff template
+│   ├── takeoff-template-structure.md      <- How to build your Excel takeoff template
+│   └── takeoff-template.xlsx              <- Excel template the takeoff skill copies and fills
 ├── indexes/                               <- Created by Drawing Analyzer. Do not edit manually.
-└── sheets/                                <- Created by Drawing Analyzer. Do not edit manually.
+├── sheets/                                <- Created by Drawing Analyzer. Do not edit manually.
+├── inputs/                                <- Source PDFs for markup jobs (gitignored)
+└── outputs/                               <- Takeoffs, markups and marked-up PDFs (gitignored)
 ```
 
 ---
